@@ -243,9 +243,6 @@ SECTIONS
    __mainPoolStart = .;
    __mainPoolSize = RAM_END - .;
 
-   __expansionRamStart = 0x80400000;
-   ASSERT((. <= __expansionRamStart), "Error: RDRAM expanded into Expansion RAM, despite Expansion RAM not being defined.")
-
    BEGIN_SEG(entry, 0x10000000)
    {
       BUILD_DIR/levels/entry.o(.data);

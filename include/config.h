@@ -40,8 +40,8 @@
 #define CLEARRAM 1
 
 // Screen Size Defines
-#define SCREEN_WIDTH 320
-#define SCREEN_HEIGHT 240
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
 
 // Border Height Define for NTSC Versions
 #ifdef TARGET_N64

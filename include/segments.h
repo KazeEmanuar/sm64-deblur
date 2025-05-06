@@ -14,11 +14,7 @@
  * linker script syntax.
 */
 
-#ifndef USE_EXT_RAM
-#define RAM_END          0x80400000
-#else
 #define RAM_END          0x80800000
-#endif
 
 /*
  * Workaround for running out of pool space due to

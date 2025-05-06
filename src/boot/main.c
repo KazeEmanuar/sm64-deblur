@@ -447,21 +447,22 @@ void thread1_idle(UNUSED void *arg) {
 	switch ( osTvType ) {
 	case OS_TV_NTSC:
 		// NTSC
-        VI = osViModeNtscLan1;
+        VI = osViModeNtscHpf1;
 		break;
 	case OS_TV_MPAL:
 		// MPAL
-        VI = osViModeMpalLan1;
+        VI = osViModeMpalHpf1;
 		break;
 	case OS_TV_PAL:
 		// PAL
-        VI = osViModePalLan1;
+        VI = osViModePalHpf1;
 		break;
 	}
     change_vi(&VI, SCREEN_WIDTH, SCREEN_HEIGHT);
     osViSetMode(&VI);
     osViBlack(TRUE);
-    osViSetSpecialFeatures(OS_VI_DITHER_FILTER_ON);
+    osViSetSpecialFeatures(OS_VI_DITHER_FILTER_OFF);
+    osViSetSpecialFeatures(OS_VI_DIVOT_OFF);
     osViSetSpecialFeatures(OS_VI_GAMMA_OFF);
     osCreatePiManager(OS_PRIORITY_PIMGR, &gPIMesgQueue, gPIMesgBuf, ARRAY_COUNT(gPIMesgBuf));
     create_thread(&gMainThread, 3, thread3_main, NULL, gThread3Stack + 0x2000, 100);
