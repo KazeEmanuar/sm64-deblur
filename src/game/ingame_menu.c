@@ -1657,7 +1657,7 @@ s16 gCutsceneMsgDuration = -1;
 s16 gCutsceneMsgTimer = 0;
 s8 gDialogCameraAngleIndex = CAM_SELECTION_MARIO;
 s8 gDialogCourseActNum = 1;
-
+extern s32 CurInterlace;
 #if defined(VERSION_JP) || defined(VERSION_SH)
     #define DIAG_VAL1 20
     #define DIAG_VAL2 240
@@ -1800,7 +1800,7 @@ void render_dialog_entries(void) {
     render_dialog_box_type(dialog, dialog->linesPerBox);
 
     gDPSetScissor(
-        gDisplayListHead++, G_SC_NON_INTERLACE,
+        gDisplayListHead++, CurInterlace,
         // Horizontal scissoring isn't really required and can potentially mess up widescreen enhancements.
 #ifdef WIDESCREEN
         0,
@@ -1834,7 +1834,7 @@ void render_dialog_entries(void) {
     if (gLastDialogPageStrPos == -1 && gLastDialogResponse == 1) {
         render_dialog_triangle_choice();
     }
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 2, 2, SCREEN_WIDTH - gBorderHeight/2, SCREEN_HEIGHT - gBorderHeight/2);
+    gDPSetScissor(gDisplayListHead++, CurInterlace, 2, 2, SCREEN_WIDTH - gBorderHeight/2, SCREEN_HEIGHT - gBorderHeight/2);
     if (gLastDialogPageStrPos != -1 && gDialogBoxState == DIALOG_STATE_VERTICAL) {
         render_dialog_triangle_next(dialog->linesPerBox);
     }

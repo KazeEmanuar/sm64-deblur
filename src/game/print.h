@@ -4,9 +4,9 @@
 #include <PR/ultratypes.h>
 
 #define TEXRECT_MIN_X 10
-#define TEXRECT_MAX_X 300
+#define TEXRECT_MAX_X (300*2)
 #define TEXRECT_MIN_Y 5
-#define TEXRECT_MAX_Y 220
+#define TEXRECT_MAX_Y (220*2)
 
 #define GLYPH_SPACE           -1
 #define GLYPH_U               30

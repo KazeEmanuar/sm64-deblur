@@ -102,11 +102,12 @@ struct DemoInput gRecordedDemoInput = { 0 };
 /**
  * Sets the initial RDP (Reality Display Processor) rendering settings.
  */
+extern s32 CurInterlace;
 void init_rdp(void) {
     gDPPipeSync(gDisplayListHead++);
     gDPPipelineMode(gDisplayListHead++, G_PM_1PRIMITIVE);
 
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gDPSetScissor(gDisplayListHead++, CurInterlace, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gDPSetCombineMode(gDisplayListHead++, G_CC_SHADE, G_CC_SHADE);
 
     gDPSetTextureLOD(gDisplayListHead++, G_TL_TILE);
@@ -173,7 +174,7 @@ void select_framebuffer(void) {
     gDPSetCycleType(gDisplayListHead++, G_CYC_1CYCLE);
     gDPSetColorImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH,
                      gPhysicalFramebuffers[sRenderingFramebuffer]);
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+    gDPSetScissor(gDisplayListHead++, CurInterlace, 0, gBorderHeight, SCREEN_WIDTH,
                   SCREEN_HEIGHT - gBorderHeight);
 }
 
@@ -230,7 +231,7 @@ void clear_viewport(Vp *viewport, s32 color) {
 void draw_screen_borders(void) {
     gDPPipeSync(gDisplayListHead++);
 
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+    gDPSetScissor(gDisplayListHead++, CurInterlace, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     gDPSetRenderMode(gDisplayListHead++, G_RM_OPA_SURF, G_RM_OPA_SURF2);
     gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
 
@@ -255,7 +256,7 @@ void make_viewport_clip_rect(Vp *viewport) {
     s16 vpLrx = (viewport->vp.vtrans[0] + viewport->vp.vscale[0]) / 4 - 1;
     s16 vpLry = (viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4 - 1;
 
-    gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, vpUlx, vpPly, vpLrx, vpLry);
+    gDPSetScissor(gDisplayListHead++, CurInterlace, vpUlx, vpPly, vpLrx, vpLry);
 }
 
 /**
@@ -719,6 +720,7 @@ void setup_game_memory(void) {
 /**
  * Main game loop thread. Runs forever as long as the game continues.
  */
+extern OSViMode VI;
 void thread5_game_loop(UNUSED void *arg) {
     struct LevelCommand *addr;
 
@@ -767,6 +769,18 @@ void thread5_game_loop(UNUSED void *arg) {
         addr = level_script_execute(addr);
 
         display_and_vsync();
+        if (CurInterlace) {
+            CurInterlace ^= 1;
+            u8 odd = CurInterlace & 1;
+            u32 origin = odd ? 1280 : 2560;
+            u32 vStart = odd ? (35 << 16 | 509) : (37 << 16 | 511);
+
+            VI.fldRegs[0].origin = origin;
+            VI.fldRegs[0].vStart = vStart;
+
+            VI.fldRegs[1].origin = origin;
+            VI.fldRegs[1].vStart = vStart;
+        }
 
         // when debug info is enabled, print the "BUF %d" information.
         if (gShowDebugText) {

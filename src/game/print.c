@@ -444,7 +444,7 @@ void render_text_labels(void) {
                 }
 #else
                 add_glyph_texture(glyphIndex);
-                render_textrect(sTextLabels[i]->x, sTextLabels[i]->y, j);
+                render_textrect(sTextLabels[i]->x*2, sTextLabels[i]->y*2, j);
 #endif
             }
         }

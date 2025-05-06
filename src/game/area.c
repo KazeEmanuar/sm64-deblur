@@ -360,21 +360,22 @@ void play_transition_after_delay(s16 transType, s16 time, u8 red, u8 green, u8 b
     play_transition(transType, time, red, green, blue);
 }
 
+extern s32 CurInterlace;
 void render_game(void) {
     if (gCurrentArea != NULL && !gWarpTransition.pauseRendering) {
         geo_process_root(gCurrentArea->unk04, D_8032CE74, D_8032CE78, gFBSetColor);
 
         gSPViewport(gDisplayListHead++, VIRTUAL_TO_PHYSICAL(&D_8032CF00));
 
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+        gDPSetScissor(gDisplayListHead++, CurInterlace, 0, gBorderHeight, SCREEN_WIDTH,
                       SCREEN_HEIGHT - gBorderHeight);
         render_hud();
 
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        gDPSetScissor(gDisplayListHead++, CurInterlace, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         render_text_labels();
         do_cutscene_handler();
         print_displaying_credits_entry();
-        gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+        gDPSetScissor(gDisplayListHead++, CurInterlace, 0, gBorderHeight, SCREEN_WIDTH,
                       SCREEN_HEIGHT - gBorderHeight);
         gMenuOptSelectIndex = render_menus_and_dialogs();
 
@@ -385,7 +386,7 @@ void render_game(void) {
         if (D_8032CE78 != NULL) {
             make_viewport_clip_rect(D_8032CE78);
         } else
-            gDPSetScissor(gDisplayListHead++, G_SC_NON_INTERLACE, 0, gBorderHeight, SCREEN_WIDTH,
+            gDPSetScissor(gDisplayListHead++, CurInterlace, 0, gBorderHeight, SCREEN_WIDTH,
                           SCREEN_HEIGHT - gBorderHeight);
 
         if (gWarpTransition.isActive) {
