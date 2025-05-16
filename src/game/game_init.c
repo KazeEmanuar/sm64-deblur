@@ -134,7 +134,8 @@ void init_rdp(void) {
  */
 void init_rsp(void) {
     gSPClearGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BOTH | G_FOG
-                        | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR | G_LOD);
+                                                 | G_LIGHTING | G_TEXTURE_GEN | G_TEXTURE_GEN_LINEAR
+                                                 | G_LOD);
 
     gSPSetGeometryMode(gDisplayListHead++, G_SHADE | G_SHADING_SMOOTH | G_CULL_BACK | G_LIGHTING);
 
@@ -158,8 +159,7 @@ void init_z_buffer(void) {
     gDPSetDepthImage(gDisplayListHead++, gPhysicalZBuffer);
 
     gDPSetColorImage(gDisplayListHead++, G_IM_FMT_RGBA, G_IM_SIZ_16b, SCREEN_WIDTH, gPhysicalZBuffer);
-    gDPSetFillColor(gDisplayListHead++,
-                    GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
+    gDPSetFillColor(gDisplayListHead++, GPACK_ZDZ(G_MAXFBZ, 0) << 16 | GPACK_ZDZ(G_MAXFBZ, 0));
 
     gDPFillRectangle(gDisplayListHead++, 0, gBorderHeight, SCREEN_WIDTH - 1,
                      SCREEN_HEIGHT - 1 - gBorderHeight);
@@ -189,8 +189,7 @@ void clear_framebuffer(s32 color) {
     gDPSetCycleType(gDisplayListHead++, G_CYC_FILL);
 
     gDPSetFillColor(gDisplayListHead++, color);
-    gDPFillRectangle(gDisplayListHead++,
-                     GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
+    gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), gBorderHeight,
                      GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - gBorderHeight - 1);
 
     gDPPipeSync(gDisplayListHead++);
@@ -239,10 +238,10 @@ void draw_screen_borders(void) {
 
     if (gBorderHeight) {
         gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0,
-                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, gBorderHeight - 1);
-        gDPFillRectangle(gDisplayListHead++,
-                        GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), SCREEN_HEIGHT - gBorderHeight,
-                        GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, SCREEN_HEIGHT - 1);
+                         GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1, gBorderHeight - 1);
+        gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0),
+                         SCREEN_HEIGHT - gBorderHeight, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0) - 1,
+                         SCREEN_HEIGHT - 1);
     }
 }
 
@@ -272,32 +271,38 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.ucode_boot = rspbootTextStart;
     gGfxSPTask->task.t.ucode_boot_size = ((u8 *) rspbootTextEnd - (u8 *) rspbootTextStart);
     gGfxSPTask->task.t.flags = 0;
-#ifdef  L3DEX2_ALONE
+#ifdef L3DEX2_ALONE
     gGfxSPTask->task.t.ucode = gspL3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspL3DEX2_fifoDataStart;
     gGfxSPTask->task.t.ucode_size = ((u8 *) gspL3DEX2_fifoTextEnd - (u8 *) gspL3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspL3DEX2_fifoDataEnd - (u8 *) gspL3DEX2_fifoDataStart);
-#elif  F3DZEX_GBI_2
+    gGfxSPTask->task.t.ucode_data_size =
+        ((u8 *) gspL3DEX2_fifoDataEnd - (u8 *) gspL3DEX2_fifoDataStart);
+#elif F3DZEX_GBI_2
     gGfxSPTask->task.t.ucode = gspF3DZEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DZEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DZEX2_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DZEX2_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_PosLight_fifoDataStart);
-#elif   F3DEX2PL_GBI
+    gGfxSPTask->task.t.ucode_size =
+        ((u8 *) gspF3DZEX2_PosLight_fifoTextEnd - (u8 *) gspF3DZEX2_PosLight_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size =
+        ((u8 *) gspF3DZEX2_PosLight_fifoDataEnd - (u8 *) gspF3DZEX2_PosLight_fifoDataStart);
+#elif F3DEX2PL_GBI
     gGfxSPTask->task.t.ucode = gspF3DEX2_PosLight_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_PosLight_fifoDataStart;
-    gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX2_PosLight_fifoTextEnd - (u8 *) gspF3DEX2_PosLight_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX2_PosLight_fifoDataEnd - (u8 *) gspF3DEX2_PosLight_fifoDataStart);
-#elif   F3DEX_GBI_2
+    gGfxSPTask->task.t.ucode_size =
+        ((u8 *) gspF3DEX2_PosLight_fifoTextEnd - (u8 *) gspF3DEX2_PosLight_fifoTextStart);
+    gGfxSPTask->task.t.ucode_data_size =
+        ((u8 *) gspF3DEX2_PosLight_fifoDataEnd - (u8 *) gspF3DEX2_PosLight_fifoDataStart);
+#elif F3DEX_GBI_2
     gGfxSPTask->task.t.ucode = gspF3DEX2_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX2_fifoDataStart;
     gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX2_fifoTextEnd - (u8 *) gspF3DEX2_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX2_fifoDataEnd - (u8 *) gspF3DEX2_fifoDataStart);
-#elif   F3DEX_GBI
+    gGfxSPTask->task.t.ucode_data_size =
+        ((u8 *) gspF3DEX2_fifoDataEnd - (u8 *) gspF3DEX2_fifoDataStart);
+#elif F3DEX_GBI
     gGfxSPTask->task.t.ucode = gspF3DEX_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspF3DEX_fifoDataStart;
     gGfxSPTask->task.t.ucode_size = ((u8 *) gspF3DEX_fifoTextEnd - (u8 *) gspF3DEX_fifoTextStart);
     gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspF3DEX_fifoDataEnd - (u8 *) gspF3DEX_fifoDataStart);
-#elif   SUPER3D_GBI
+#elif SUPER3D_GBI
     gGfxSPTask->task.t.ucode = gspSuper3DTextStart;
     gGfxSPTask->task.t.ucode_data = gspSuper3DDataStart;
     gGfxSPTask->task.t.ucode_size = ((u8 *) gspSuper3DTextEnd - (u8 *) gspSuper3DTextStart);
@@ -306,13 +311,14 @@ void create_gfx_task_structure(void) {
     gGfxSPTask->task.t.ucode = gspFast3D_fifoTextStart;
     gGfxSPTask->task.t.ucode_data = gspFast3D_fifoDataStart;
     gGfxSPTask->task.t.ucode_size = ((u8 *) gspFast3D_fifoTextEnd - (u8 *) gspFast3D_fifoTextStart);
-    gGfxSPTask->task.t.ucode_data_size = ((u8 *) gspFast3D_fifoDataEnd - (u8 *) gspFast3D_fifoDataStart);
+    gGfxSPTask->task.t.ucode_data_size =
+        ((u8 *) gspFast3D_fifoDataEnd - (u8 *) gspFast3D_fifoDataStart);
 #endif
     gGfxSPTask->task.t.dram_stack = (u64 *) gGfxSPTaskStack;
     gGfxSPTask->task.t.dram_stack_size = SP_DRAM_STACK_SIZE8;
     gGfxSPTask->task.t.output_buff = gGfxSPTaskOutputBuffer;
     gGfxSPTask->task.t.output_buff_size =
-        (u64 *)((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
+        (u64 *) ((u8 *) gGfxSPTaskOutputBuffer + sizeof(gGfxSPTaskOutputBuffer));
     gGfxSPTask->task.t.data_ptr = (u64 *) &gGfxPool->buffer;
     gGfxSPTask->task.t.data_size = entries * sizeof(Gfx);
     gGfxSPTask->task.t.yield_data_ptr = (u64 *) gGfxSPTaskYieldBuffer;
@@ -331,7 +337,8 @@ void init_rcp(void) {
 }
 
 /**
- * End the master display list and initialize the graphics task structure for the next frame to be rendered.
+ * End the master display list and initialize the graphics task structure for the next frame to be
+ * rendered.
  */
 void end_master_display_list(void) {
     draw_screen_borders();
@@ -365,7 +372,8 @@ void draw_reset_bars(void) {
 
         for (width = 0; width < ((SCREEN_HEIGHT / 16) + 1); width++) {
             // Loop must be one line to match on -O2
-            for (height = 0; height < (SCREEN_WIDTH / 4); height++) *fbPtr++ = 0;
+            for (height = 0; height < (SCREEN_WIDTH / 4); height++)
+                *fbPtr++ = 0;
             fbPtr += ((SCREEN_WIDTH / 4) * 14);
         }
     }
@@ -382,7 +390,7 @@ void check_cache_emulation() {
     volatile u8 sCachedValue = 1;
     // Overwrite the variable directly in RDRAM without going through cache.
     // This should preserve its value of 1 in dcache if dcache is emulated correctly.
-    *(u8*)(K0_TO_K1(&sCachedValue)) = 0;
+    *(u8 *) (K0_TO_K1(&sCachedValue)) = 0;
     // Read the variable back from dcache, if it's still 1 then cache is emulated correctly.
     // If it's zero, then dcache is not emulated correctly.
     gCacheEmulated = sCachedValue;
@@ -401,18 +409,19 @@ void render_init(void) {
     } else {
         gIsConsole = 1;
         gBorderHeight = BORDER_HEIGHT_CONSOLE;
-    }    
+    }
     gGfxPool = &gGfxPools[0];
     set_segment_base_addr(1, gGfxPool->buffer);
     gGfxSPTask = &gGfxPool->spTask;
     gDisplayListHead = gGfxPool->buffer;
-    gGfxPoolEnd = (u8 *)(gGfxPool->buffer + GFX_POOL_SIZE);
+    gGfxPoolEnd = (u8 *) (gGfxPool->buffer + GFX_POOL_SIZE);
     init_rcp();
     clear_framebuffer(0);
     end_master_display_list();
     exec_display_list(&gGfxPool->spTask);
 
-    // Skip incrementing the initial framebuffer index on emulators other than Ares so that they display immediately as the Gfx task finishes
+    // Skip incrementing the initial framebuffer index on emulators other than Ares so that they display
+    // immediately as the Gfx task finishes
     if (gIsConsole || gCacheEmulated) { // Read RDP Clock Register, has a value of zero on emulators
         sRenderingFramebuffer++;
     }
@@ -450,7 +459,8 @@ void display_and_vsync(void) {
     osViSwapBuffer((void *) PHYSICAL_TO_VIRTUAL(gPhysicalFramebuffers[sRenderedFramebuffer]));
     profiler_log_thread5_time(THREAD5_END);
     osRecvMesg(&gGameVblankQueue, &gMainReceivedMesg, OS_MESG_BLOCK);
-    // Skip swapping buffers on emulator other than Ares so that they display immediately as the Gfx task finishes
+    // Skip swapping buffers on emulator other than Ares so that they display immediately as the Gfx
+    // task finishes
     if (gIsConsole || gCacheEmulated) { // Read RDP Clock Register, has a value of zero on emulators
         if (++sRenderedFramebuffer == 3) {
             sRenderedFramebuffer = 0;
@@ -769,18 +779,8 @@ void thread5_game_loop(UNUSED void *arg) {
         addr = level_script_execute(addr);
 
         display_and_vsync();
-        if (CurInterlace) {
+        if (CurInterlace)
             CurInterlace ^= 1;
-            u8 odd = CurInterlace & 1;
-            u32 origin = odd ? 1280 : 2560;
-            u32 vStart = odd ? (35 << 16 | 509) : (37 << 16 | 511);
-
-            VI.fldRegs[0].origin = origin;
-            VI.fldRegs[0].vStart = vStart;
-
-            VI.fldRegs[1].origin = origin;
-            VI.fldRegs[1].vStart = vStart;
-        }
 
         // when debug info is enabled, print the "BUF %d" information.
         if (gShowDebugText) {

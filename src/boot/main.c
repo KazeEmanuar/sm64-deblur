@@ -312,6 +312,7 @@ void handle_dp_complete(void) {
 extern void crash_screen_init(void);
 
 s32 CurInterlace = 0;
+u8 odd = 0;
 void thread3_main(UNUSED void *arg) {
     setup_mesg_queues();
     alloc_pool();
@@ -346,6 +347,17 @@ void thread3_main(UNUSED void *arg) {
         switch ((uintptr_t) msg) {
             case MESG_VI_VBLANK:
                 handle_vblank();
+                if (CurInterlace) {
+                    odd ^=1;
+                    u32 origin = odd ? 1280 : 2560;
+                    u32 vStart = odd ? (35 << 16 | 509) : (37 << 16 | 511);
+
+                    VI.fldRegs[0].origin = origin;
+                    VI.fldRegs[0].vStart = vStart;
+
+                    VI.fldRegs[1].origin = origin;
+                    VI.fldRegs[1].vStart = vStart;
+                }
                 break;
             case MESG_SP_COMPLETE:
                 handle_sp_complete();
